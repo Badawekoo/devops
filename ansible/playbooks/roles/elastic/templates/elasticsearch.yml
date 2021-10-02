@@ -15,14 +15,14 @@
 #
 # Use a descriptive name for your cluster:
 #
-cluster.name: vfe-logs-prod
+cluster.name: Cluster_Name
 #
 
 # ------------------------------------ Node ------------------------------------
 #
 # Use a descriptive name for the node:
 #
-node.name: 'DCHQELASDATA11'
+node.name: 'NODE_NAME'
 #
 # Add custom attributes to the node:
 node.data: true
@@ -35,14 +35,14 @@ node.master: false
 #
 # Path to directory where to store the data (separate multiple locations by comma):
 #
-path.data: /elastic/disk1,/elastic/disk2,/elastic/disk3,/elastic/disk4
+#path.data: /elastic/disk1,/elastic/disk2,/elastic/disk3,/elastic/disk4
 #
 # Path to log files:
 #
 path.logs: /var/log/elasticsearch
 #path.repo for backup
 #path.repo: /backup
-path.repo: ["/backup"]
+#path.repo: ["/backup"]
 # ----------------------------------- Memory -----------------------------------
 #
 # Lock the memory on startup:
@@ -59,7 +59,7 @@ path.repo: ["/backup"]
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: 'DCHQELASDATA11'
+network.host: 'NODA_NAME'
 #
 # Set a custom port for HTTP:
 #
@@ -67,29 +67,13 @@ network.host: 'DCHQELASDATA11'
 #
 # For more information, consult the network module documentation.
 # --------------------------------- Discovery ----------------------------------
-discovery.seed_hosts: ["DCHQELASDATA01","DCHQELASDATA02","DCHQELASMASTER01","DCHQELASMASTER02","DCHQELASNGST01","DCHQELASNGST02","DCHQELASNGST03","DCHQELASDATA03","DCHQELASDATA04","DCHQELASMASTER03","DCHQELASDATA05","DCHQELASDATA06","DCHQELASDATA07","DCHQELASDATA08","DCHQELASDATA10"]
+discovery.seed_hosts: ["ELK_Stack_Machines"]
 
-cluster.initial_master_nodes: ["DCHQELASMASTER01", "DCHQELASMASTER02" ,"DCHQELASMASTER03"]
+cluster.initial_master_nodes: ["MASTER_Nodes"]
 
-# Pass an initial list of hosts to perform discovery when new node is started:
-# The default list of hosts is ["127.0.0.1", "[::1]"]
-#
-#10.230.84.130   DCHQELASDATA01
-#10.230.84.131   DCHQELASDATA02
-#10.230.84.41    DCHQELASDATA03
-#10.230.84.42    DCHQELASDATA04
-#10.230.84.140   DCHQELASDATA05
-#10.230.84.141   DCHQELASDATA06
-#10.230.84.137   DCHQELASDATA07
-#10.230.84.176   DCHQELASDATA08
-#10.230.84.132   DCHQELASMASTER01
-#10.230.84.133   DCHQELASMASTER02
-#10.230.84.43    DCHQELASMASTER03
-#10.230.84.134   DCHQELASNGST01
-#10.230.84.135   DCHQELASDATA10
-#10.230.84.82    DCHQELASNGST03
 
-#discovery.zen.ping.unicast.hosts: ["DCHQELASDATA02","DCHQELASMASTER01","DCHQELASMASTER02","DCHQELASNGST01","DCHQELASNGST02","DCHQELASNGST03","DCHQELASDATA03","DCHQELASDATA04","DCHQELASMASTER03"]
+
+#discovery.zen.ping.unicast.hosts: [""]
 #discovery.zen.ping.multicast.enable: false
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
@@ -114,12 +98,12 @@ gateway.recover_after_time: 3m
 #
 indices.query.bool.max_clause_count: 2000
 ###################################X-Pack Configs################################
-xpack.security.transport.ssl.enabled: true
-xpack.security.enabled: true
-xpack.security.transport.ssl.verification_mode: certificate
-xpack.security.transport.ssl.keystore.path: /etc/elasticsearch/certs/elastic-certificates.p12
-xpack.security.transport.ssl.truststore.path: /etc/elasticsearch/certs/elastic-certificates.p12
-indices.lifecycle.history_index_enabled: false
+# xpack.security.transport.ssl.enabled: true
+# xpack.security.enabled: true
+# xpack.security.transport.ssl.verification_mode: certificate
+# xpack.security.transport.ssl.keystore.path: /etc/elasticsearch/certs/elastic-certificates.p12
+# xpack.security.transport.ssl.truststore.path: /etc/elasticsearch/certs/elastic-certificates.p12
+# indices.lifecycle.history_index_enabled: false
 
 #xpack.notification.email.account:
 #    exchange_account:
