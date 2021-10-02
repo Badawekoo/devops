@@ -13,18 +13,6 @@
      name: /tmp/elasticsearch-7.6.2-x86_64.rpm
      state: present
 
-- name: create directory /etc/elasticsearch/certs
-  file:
-   path: /etc/elasticsearch/certs
-   state: directory
-   owner: elasticsearch
-   group: elasticsearch
-   
-- name: FTP cert file to destination servers
-  copy:
-   src=../../../src/cert/elastic-certificates.p12
-   dest=/etc/elasticsearch/certs 
-     
 - name: Make elasticsearch dirs tree owned by elasticsearch user
   file:
    path: "{{ item }}"
@@ -32,10 +20,17 @@
    group: elasticsearch
    recurse: yes   
   with_items:
-   - /etc/elasticsearch
+   - /etc/elasticsearch/certs
    - /usr/share/elasticsearch
    - /var/log/elasticsearch
    - /elastic
+   - /backup
+
+- name: FTP cert file to destination servers
+  copy:
+   src=../../../src/cert/elastic-certificates.p12
+   dest=/etc/elasticsearch/certs 
+     
 
 - name: Change file ownership, group and permissions
   file:
@@ -44,6 +39,8 @@
     group: elasticsearch
     mode: '0644'   
 
+####### To overcome runtime issue related to simultaneous sessions limit ########
+
 - name: Add security limits to elasticsearch
   blockinfile:
     dest: /etc/security/limits.conf
@@ -51,13 +48,6 @@
       elasticsearch soft memlock unlimited
       elasticsearch hard memlock unlimited
     backup: yes
-
-- name: create directory /backup
-  file:
-   path: /backup
-   state: directory
-   owner: elasticsearch
-   group: elasticsearch
 
 ########## Disable Firewalld  ################### 
 - name: Disable the firewalld service
