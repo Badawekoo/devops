@@ -1,0 +1,8 @@
+elastic1 ansible_ssh_host=X.X.X.X
+[ElasticServers]
+elastic1
+
+[ElasticServers:vars]
+ansible_ssh_user=XXX
+ansible_ssh_pass=XXX
+ansible_become_pass=XXX

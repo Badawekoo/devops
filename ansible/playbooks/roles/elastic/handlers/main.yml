@@ -1,0 +1,4 @@
+---  
+- name: "enable Elastic Service"
+  shell: sudo systemctl enable elasticsearch && sudo systemctl start elasticsearch
+  listen: "reload system services"

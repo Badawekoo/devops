@@ -1,0 +1,9 @@
+# You can run this playbook with the following command:
+# ansible-playbook -i hosts/apache.hosts playbooks/apache-setup.yml
+
+- hosts: ElasticServers
+  remote_user: ADD_REMOTE_USER_HERE
+  become: true
+  become_user: root
+  roles:
+     - role: elastic

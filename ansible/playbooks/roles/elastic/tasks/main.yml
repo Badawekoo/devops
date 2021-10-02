@@ -1,0 +1,121 @@
+---
+- debug:
+    msg: Machine {{ inventory_hostname }} has IP {{ ansible_default_ipv4.address }}
+  when: ansible_default_ipv4.address is defined
+
+- name: FTP elastic rpm file to destination servers
+  copy:
+   src=../../../src/elasticsearch-7.6.2-x86_64.rpm
+   dest=/tmp/
+
+- name: Install elasticsearch package
+  yum:
+     name: /tmp/elasticsearch-7.6.2-x86_64.rpm
+     state: present
+
+- name: create directory /etc/elasticsearch/certs
+  file:
+   path: /etc/elasticsearch/certs
+   state: directory
+   owner: elasticsearch
+   group: elasticsearch
+   
+- name: FTP cert file to destination servers
+  copy:
+   src=../../../src/cert/elastic-certificates.p12
+   dest=/etc/elasticsearch/certs 
+     
+- name: Make elasticsearch dirs tree owned by elasticsearch user
+  file:
+   path: "{{ item }}"
+   owner: elasticsearch
+   group: elasticsearch
+   recurse: yes   
+  with_items:
+   - /etc/elasticsearch
+   - /usr/share/elasticsearch
+   - /var/log/elasticsearch
+   - /elastic
+
+- name: Change file ownership, group and permissions
+  file:
+    path: /etc/sysconfig/elasticsearch
+    owner: elasticsearch
+    group: elasticsearch
+    mode: '0644'   
+
+- name: Add security limits to elasticsearch
+  blockinfile:
+    dest: /etc/security/limits.conf
+    block: |
+      elasticsearch soft memlock unlimited
+      elasticsearch hard memlock unlimited
+    backup: yes
+
+- name: create directory /backup
+  file:
+   path: /backup
+   state: directory
+   owner: elasticsearch
+   group: elasticsearch
+
+########## Disable Firewalld  ################### 
+- name: Disable the firewalld service
+  service:
+   name: firewalld
+   enabled: no
+   state: stopped
+
+########## Disable swap  ###################      
+- name: Disable SWAP
+  shell: |
+    swapoff -a
+  
+- name: Disable SWAP in fstab
+  replace:
+    path: /etc/fstab
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'   
+
+################## Add new entries in hosts file ###############
+- name: Add ELK stack machines to the hosts file of the new machine
+  blockinfile:
+    dest: /etc/hosts
+    block: |
+      X.X.X.X   ELKMachineDNS1
+      X.X.X.X   ELKMachineDNS2
+      X.X.X.X   ELKMachineDNS3
+
+    backup: yes
+
+#################### Templates ################################
+
+- name: Add jvm.options file
+  template: src=./templates/jvm.options dest=/etc/elasticsearch/ mode=0660   
+
+
+- name: Add elasticsearch yaml file
+  template: src=./templates/elasticsearch.yml dest=/etc/elasticsearch/ mode=0664
+  changed_when: True
+  notify:
+      - "reload system services"
+      
+
+########## If you don't want to disable firewalld, use the below ################
+
+  # # - name: Open port 80 for http access
+    # # firewalld:
+      # # service: http
+      # # permanent: true
+      # # state: enabled
+      
+  # # - name: Open port 443 for http access
+    # # firewalld:
+      # # service: https
+      # # permanent: true
+      # # state: enabled
+     
+  # # - name: Restart the firewalld service to load in the firewall changes
+    # # service:
+      # # name: firewalld
+      # # state: restarted
