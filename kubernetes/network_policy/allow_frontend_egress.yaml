@@ -1,0 +1,20 @@
+###### egress access is allowed from frontend pods in frontend namespace only to backend pods in backend namespace #####
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend
+  namespace: frontend
+spec:
+  podSelector:
+    matchLabels:
+      run: frontend
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          ns: backend
+    - podSelector:
+        matchLabels:
+          run: backend

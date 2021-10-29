@@ -1,0 +1,35 @@
+### This will deny all incoming and outgoing traffic on all pods in frontend,backend and db namespaces ###
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny
+  namespace: frontend
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  - Ingress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny
+  namespace: backend
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  - Ingress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny
+  namespace: db
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  - Ingress
