@@ -1,2 +1,7 @@
 ./ansible/playbooks/src/*
 *.rpm
+.DS_Store
+terraform/passing-outputs/.terraform.lock.hcl
+terraform/passing-outputs/.terraform/modules/modules.json
+terraform/passing-outputs/.terraform/providers/registry.terraform.io/hashicorp/azurerm/2.40.0/darwin_amd64/terraform-provider-azurerm_v2.40.0_x5
+terraform/passing-outputs/.terraform/providers/registry.terraform.io/hashicorp/random/3.1.0/darwin_amd64/terraform-provider-random_v3.1.0_x5

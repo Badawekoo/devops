@@ -3,7 +3,7 @@ variable "saname" {
     description = "Name of storage account"
 }
 
-variable "salocation" {
+variable "location" {
     type = string
     description = "Azure location of storage account environment"
 }

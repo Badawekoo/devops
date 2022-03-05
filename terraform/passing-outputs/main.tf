@@ -13,26 +13,19 @@ provider "azurerm" {
   features {}
 }
 
+#Create Resource Group
 module "resource_group" {
   source    = "./modules/resource_group"
 
   rgname    = var.rgname
-  rglocation  = var.rglocation
+  location  = var.location
 }
 
 #Create Storage Account
 module "storage_account" {
-  source    = "./modules/storage-account"
+  source    = "./modules/storage_account"
+
   resource_group_name = module.resource_group.rgname
   saname    = var.saname
-  salocation  = var.salocation
+  location  = var.location
 }
-
-#Create Storage Account
-# module "storage_account2" {
-#   source    = "./modules/storage-account"
-
-#   saname    = "sacal1297202"
-#   rgname    = "cal-1297-20"
-#   location  = "westus"
-# }

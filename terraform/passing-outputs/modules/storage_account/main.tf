@@ -5,9 +5,9 @@ resource "random_string" "random" {
 }
 
 resource "azurerm_storage_account" "sa" {
-  name                     = "${var.saname}$-{random_string.random.result}"
+  name                     = "${var.saname}${random_string.random.result}"
   resource_group_name      = var.resource_group_name
-  location                 = var.salocation
+  location                 = var.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
 

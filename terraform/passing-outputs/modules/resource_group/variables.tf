@@ -3,7 +3,7 @@ variable "rgname" {
     description = "Name of resource group"
 }
 
-variable "rglocation" {
+variable "location" {
     type = string
     description = "Azure location of resource group"
 }
