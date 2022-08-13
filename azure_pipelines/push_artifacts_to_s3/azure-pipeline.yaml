@@ -1,0 +1,30 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+- name: account
+  displayName: Account Name
+  type: string
+  default: dev
+  values:
+  - dev
+  - preprod
+  - prod
+  
+stages:
+- stage: UploadToS3
+  displayName: 'Push Artifacts to s3'
+  jobs:
+  - job: Upload_To_S3
+    steps:
+    - task: S3Upload@1
+      displayName: 'Upload artifacts to s3 buckets'
+      inputs:
+        awsCredentials: '${{ parameters.account }}-s3-uploader'
+        regionName: 'eu-west-1'
+        bucketName: '${{ parameters.account }}-frontend-origin'
+        sourceFolder: '$(System.DefaultWorkingDirectory)/resources/s3'
+        globExpressions: '**'
+        filesAcl: 'bucket-owner-full-control'
