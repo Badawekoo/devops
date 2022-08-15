@@ -1,0 +1,39 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+ - stage: 'StageName'
+   pool: 'Pool-Name' ### Optional Field
+   jobs:
+########## First Job ##########
+   - job: 'First_Job_Name'
+     continueOnError: false
+     steps:
+     - task: Bash@3
+       name: myvar
+       displayName: Getting myvar
+       inputs:
+         targetType: 'inline'
+         script: |
+         # Define MY_VAR and setting it as output from this task
+            MY_VAR=$(echo Hello_World)
+            echo $MY_VAR
+            echo "##vso[task.setvariable variable=MY_VAR;isOutput=true]$MY_VAR"
+         failOnStderr: false
+########### Second Job ##########
+   - job: 'Second_Job_Name'
+     dependsOn: 'First_Job_Name'
+     variables:
+      # Define MY_VAR to be get its value from the first job's variable
+      MY_VAR: $[ dependencies.First_Job_Name.outputs['myvar.MY_VAR'] ]
+     continueOnError: false
+     steps:
+     - task: Bash@3
+       displayName: Using var passed from first job
+       inputs:
+         targetType: 'inline'
+         script: |
+            echo $(MY_VAR)
+         failOnStderr: false
