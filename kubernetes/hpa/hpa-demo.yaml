@@ -1,0 +1,24 @@
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa-demo
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: memory
+        target:
+          averageValue: 100Mi
+          type: Utilization
+      type: Resource
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
