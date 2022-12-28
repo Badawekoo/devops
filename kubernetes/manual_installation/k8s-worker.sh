@@ -2,7 +2,21 @@
 
 # Source: http://kubernetes.io/docs/getting-started-guides/kubeadm
 
-KUBE_VERSION=1.22.2
+set -e
+
+source /etc/lsb-release
+if [ "$DISTRIB_RELEASE" != "20.04" ]; then
+    echo "################################# "
+    echo "############ WARNING ############ "
+    echo "################################# "
+    echo
+    echo "This script only works on Ubuntu 20.04!"
+    echo "You're using: ${DISTRIB_DESCRIPTION}"
+    echo "Better ABORT with Ctrl+C. Or press any key to continue the install"
+    read
+fi
+
+KUBE_VERSION=1.25.4
 
 
 ### setup terminal
@@ -21,15 +35,30 @@ sed -i '1s/^/force_color_prompt=yes\n/' ~/.bashrc
 
 ### disable linux swap and remove any existing swap partitions
 swapoff -a
-sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+sed -i '/\sswap\s/ s/^\(.*\)$/#\1/g' /etc/fstab
 
 
 ### remove packages
-kubeadm reset -f
-crictl rm $(crictl ps -a -q)
-apt-get remove -y docker.io containerd kubelet kubeadm kubectl kubernetes-cni
+kubeadm reset -f || true
+crictl rm --force $(crictl ps -a -q) || true
+apt-mark unhold kubelet kubeadm kubectl kubernetes-cni || true
+apt-get remove -y docker.io containerd kubelet kubeadm kubectl kubernetes-cni || true
 apt-get autoremove -y
 systemctl daemon-reload
+
+
+
+### install podman
+. /etc/os-release
+echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:testing.list
+curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+apt-get update -qq
+apt-get -qq -y install podman cri-tools containers-common
+rm /etc/apt/sources.list.d/devel:kubic:libcontainers:testing.list
+cat <<EOF | sudo tee /etc/containers/registries.conf
+[registries.search]
+registries = ['docker.io']
+EOF
 
 
 ### install packages
@@ -39,6 +68,7 @@ deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 apt-get update
 apt-get install -y docker.io containerd kubelet=${KUBE_VERSION}-00 kubeadm=${KUBE_VERSION}-00 kubectl=${KUBE_VERSION}-00 kubernetes-cni
+apt-mark hold kubelet kubeadm kubectl kubernetes-cni
 
 
 ### containerd
@@ -111,15 +141,6 @@ EOF
 }
 
 
-### install podman
-apt-get install software-properties-common -y
-add-apt-repository -y ppa:projectatomic/ppa
-sudo apt-get -qq -y install podman containers-common
-cat <<EOF | sudo tee /etc/containers/registries.conf
-[registries.search]
-registries = ['docker.io']
-EOF
-
 
 ### start services
 systemctl daemon-reload
@@ -128,10 +149,12 @@ systemctl restart containerd
 systemctl enable kubelet && systemctl start kubelet
 
 
+
 ### init k8s
 kubeadm reset -f
 systemctl daemon-reload
 service kubelet start
+
 
 echo
 echo "EXECUTE ON MASTER: kubeadm token create --print-join-command --ttl 0"
