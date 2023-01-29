@@ -24,3 +24,4 @@ spec:
   tls:
   - hosts:
     - test.localdev.me
+    secretName: self-tls
